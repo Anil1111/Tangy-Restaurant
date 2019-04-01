@@ -53,12 +53,17 @@
     <partial name="_CookieConsentPartial" />
 
     <div class="container body-content">
+        <br />
         @RenderBody()
+        <br />
         <hr />
-        <footer>
-            <p>&copy; 2019 - Tangy</p>
-        </footer>
     </div>
+
+    <footer class="footer">
+        <div class="cont">
+            <p class="text-muted">&copy; 2019 - Tangy</p>
+        </div>
+    </footer>
 
     <environment include="Development">
         <script src="~/lib/jquery/dist/jquery.js"></script>
