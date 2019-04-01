@@ -7,7 +7,7 @@
 <h2>Index</h2>
 
 <p>
-    @Html.Partial("_CreateButtonPartial")
+    @await Html.PartialAsync("_CreateButtonPartial")
 </p>
 <div class="form-border">
     <table class="table">
@@ -19,6 +19,7 @@
                 <th>
                     @Html.DisplayNameFor(model => model.DisplayOrder)
                 </th>
+                <th></th>
                 <th></th>
             </tr>
         </thead>
@@ -33,9 +34,7 @@
                         @Html.DisplayFor(modelItem => item.DisplayOrder)
                     </td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                        @await Html.PartialAsync("_TableButtonPartial", item.ID)
                     </td>
                 </tr>
             }
