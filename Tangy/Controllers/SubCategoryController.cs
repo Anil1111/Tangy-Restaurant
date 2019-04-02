@@ -51,34 +51,19 @@ namespace Tangy.Controllers
                 var doesSubCatAndCatExist = _db.SubCategories.Where(s => s.Name == model.SubCategory.Name && s.CategoryID == model.SubCategory.CategoryID).Count();
 
                 if (doesSubCategoryExist > 0 && model.IsNew)
-                {
-                    //error
                     StatusMessage = "Error: Sub Category Name already exists";
-                }
+                else if (doesSubCategoryExist == 0 && !model.IsNew)
+                    StatusMessage = "Error: Sub Category does not exist";
+                else if (doesSubCatAndCatExist > 0)
+                    StatusMessage = "Error: Category and Sub Category combination already exists";
                 else
                 {
-                    if (doesSubCategoryExist == 0 && !model.IsNew)
-                    {
-                        //error
-                        StatusMessage = "Error: Sub Category does not exist";
-                    }
-                    else
-                    {
-                        if (doesSubCatAndCatExist > 0)
-                        {
-                            //error
-                            StatusMessage = "Error: Category and Sub Category combination already exists";
-                        }
-                        else
-                        {
-                            _db.Add(model.SubCategory);
-                            await _db.SaveChangesAsync();
-                            return RedirectToAction(nameof(Index));
-                        }
-                    }
+                    _db.Add(model.SubCategory);
+                    await _db.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
             }
-            var modelVM = new SubCategoryAndCategoryViewModel()
+            var viewModel = new SubCategoryAndCategoryViewModel()
             {
                 CategoryList = _db.Categories.ToList(),
                 SubCategory = model.SubCategory,
@@ -86,7 +71,7 @@ namespace Tangy.Controllers
                 StatusMessage = StatusMessage
             };
 
-            return View(modelVM);
+            return View(viewModel);
         }
 
         // GET: SubCategory/Edit/5
@@ -121,27 +106,20 @@ namespace Tangy.Controllers
                 var doesSubCatAndCatExist = _db.SubCategories.Where(s => s.Name == model.SubCategory.Name && s.CategoryID == model.SubCategory.CategoryID).Count();
 
                 if (doesSubCategoryExist == 0)
-                {
                     StatusMessage = "Error: Sub Category does not exist. You cannot add a new subcategory here.";
-                }
+                else if (doesSubCatAndCatExist > 0)
+                    StatusMessage = "Error: Category and Sub Category combination already exists.";
                 else
                 {
-                    if (doesSubCatAndCatExist > 0)
-                    {
-                        StatusMessage = "Error: Category and Sub Category combination already exists.";
-                    }
-                    else
-                    {
-                        var subCatFromDb = _db.SubCategories.Find(id);
-                        subCatFromDb.Name = model.SubCategory.Name;
-                        subCatFromDb.CategoryID = model.SubCategory.CategoryID;
-                        await _db.SaveChangesAsync();
-                        return RedirectToAction(nameof(Index));
-                    }
+                    var subCatFromDb = _db.SubCategories.Find(id);
+                    subCatFromDb.Name = model.SubCategory.Name;
+                    subCatFromDb.CategoryID = model.SubCategory.CategoryID;
+                    await _db.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
             }
 
-            var modelVM = new SubCategoryAndCategoryViewModel()
+            var viewModel = new SubCategoryAndCategoryViewModel()
             {
                 CategoryList = _db.Categories.ToList(),
                 SubCategory = model.SubCategory,
@@ -149,7 +127,7 @@ namespace Tangy.Controllers
                 StatusMessage = StatusMessage
             };
 
-            return View(modelVM);
+            return View(viewModel);
         }
 
         // GET: SubCategory/Details/5
@@ -186,7 +164,7 @@ namespace Tangy.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var subCategory = await _db.SubCategories.SingleOrDefaultAsync(m=>m.ID == id);
+            var subCategory = await _db.SubCategories.SingleOrDefaultAsync(m => m.ID == id);
 
             if (subCategory == null)
                 return NotFound();

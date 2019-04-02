@@ -29,16 +29,12 @@ namespace Tangy.Controllers
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var category = await _context.Categories
-                .FirstOrDefaultAsync(m => m.ID == id);
+            var category = await _context.Categories.FirstOrDefaultAsync(m => m.ID == id);
+
             if (category == null)
-            {
                 return NotFound();
-            }
 
             return View(category);
         }
@@ -50,8 +46,6 @@ namespace Tangy.Controllers
         }
 
         // POST: Category/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Category category)
@@ -69,29 +63,23 @@ namespace Tangy.Controllers
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
             var category = await _context.Categories.FindAsync(id);
+
             if (category == null)
-            {
                 return NotFound();
-            }
+
             return View(category);
         }
 
         // POST: Category/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Category category)
         {
             if (id != category.ID)
-            {
                 return NotFound();
-            }
 
             if (ModelState.IsValid)
             {
@@ -103,13 +91,9 @@ namespace Tangy.Controllers
                 catch (DbUpdateConcurrencyException)
                 {
                     if (!CategoryExists(category.ID))
-                    {
                         return NotFound();
-                    }
                     else
-                    {
                         throw;
-                    }
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -120,16 +104,12 @@ namespace Tangy.Controllers
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
-            {
                 return NotFound();
-            }
 
-            var category = await _context.Categories
-                .FirstOrDefaultAsync(m => m.ID == id);
+            var category = await _context.Categories.FirstOrDefaultAsync(m => m.ID == id);
+
             if (category == null)
-            {
                 return NotFound();
-            }
 
             return View(category);
         }
@@ -147,7 +127,7 @@ namespace Tangy.Controllers
 
         private bool CategoryExists(int id)
         {
-            return _context.Categories.Any(e => e.ID == id);
+            return _context.Categories.Any(c => c.ID == id);
         }
     }
 }

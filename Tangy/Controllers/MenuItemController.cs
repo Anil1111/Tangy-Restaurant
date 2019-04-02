@@ -172,5 +172,19 @@ namespace Tangy.Controllers
             MenuItemVM.SubCategories = _db.SubCategories.Where(s => s.CategoryID == MenuItemVM.MenuItem.CategoryID).ToList();
             return View(MenuItemVM);
         }
+
+        // GET: MenuItem/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+                return NotFound();
+
+            MenuItemVM.MenuItem = await _db.MenuItems.Include(m => m.Category).Include(m => m.SubCategory).SingleOrDefaultAsync(m => m.ID == id);
+
+            if (MenuItemVM.MenuItem == null)
+                return NotFound();
+
+            return View(MenuItemVM);
+        }
     }
 }
