@@ -100,5 +100,77 @@ namespace Tangy.Controllers
 
             return Json(new SelectList(subCategoryList, "ID", "Name"));
         }
+
+        // GET: MenuItem/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+                return NotFound();
+
+            MenuItemVM.MenuItem = await _db.MenuItems.Include(m => m.Category).Include(m => m.SubCategory).SingleOrDefaultAsync(m => m.ID == id);
+            MenuItemVM.SubCategories = _db.SubCategories.Where(s => s.CategoryID == MenuItemVM.MenuItem.CategoryID).ToList();
+
+            if (MenuItemVM.MenuItem == null)
+                return NotFound();
+
+            return View(MenuItemVM);
+        }
+
+        // POST: MenuItem/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id)
+        {
+            MenuItemVM.MenuItem.SubCategoryID = int.Parse(Request.Form["SubCategoryID"].ToString());
+
+            if (id != MenuItemVM.MenuItem.ID)
+                return NotFound();
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    string webRootPath = _hostingEnvironment.WebRootPath;
+                    var files = HttpContext.Request.Form.Files;
+                    var menuItemFromDb = _db.MenuItems.Where(m => m.ID == MenuItemVM.MenuItem.ID).FirstOrDefault();
+
+                    if (files[0].Length > 0 && files[0] != null)
+                    {
+                        //if user uploads a new image
+                        var uploads = Path.Combine(webRootPath, "images");
+
+                        var newExtension = files[0].FileName.Substring(files[0].FileName.LastIndexOf('.'), files[0].FileName.Length - files[0].FileName.LastIndexOf('.'));
+                        var oldExtension = menuItemFromDb.Image.Substring(menuItemFromDb.Image.LastIndexOf('.'), menuItemFromDb.Image.Length - menuItemFromDb.Image.LastIndexOf('.'));
+
+                        if (System.IO.File.Exists(Path.Combine(uploads, MenuItemVM.MenuItem.ID + oldExtension)))
+                            System.IO.File.Delete(Path.Combine(uploads, MenuItemVM.MenuItem.ID + oldExtension));
+
+                        using (var filestream = new FileStream(Path.Combine(uploads, MenuItemVM.MenuItem.ID + newExtension), FileMode.Create))
+                            files[0].CopyTo(filestream);
+
+                        MenuItemVM.MenuItem.Image = @"\images\" + MenuItemVM.MenuItem.ID + newExtension;
+                    }
+
+                    if (MenuItemVM.MenuItem.Image != null)
+                        menuItemFromDb.Image = MenuItemVM.MenuItem.Image;
+
+                    menuItemFromDb.Name = MenuItemVM.MenuItem.Name;
+                    menuItemFromDb.Description = MenuItemVM.MenuItem.Description;
+                    menuItemFromDb.Price = MenuItemVM.MenuItem.Price;
+                    menuItemFromDb.Spiciness = MenuItemVM.MenuItem.Spiciness;
+                    menuItemFromDb.CategoryID = MenuItemVM.MenuItem.CategoryID;
+                    menuItemFromDb.SubCategoryID = MenuItemVM.MenuItem.SubCategoryID;
+
+                    await _db.SaveChangesAsync();
+                }
+                catch (Exception ex)
+                {
+
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            MenuItemVM.SubCategories = _db.SubCategories.Where(s => s.CategoryID == MenuItemVM.MenuItem.CategoryID).ToList();
+            return View(MenuItemVM);
+        }
     }
 }
