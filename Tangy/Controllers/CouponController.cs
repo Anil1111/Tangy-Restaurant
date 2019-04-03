@@ -51,9 +51,64 @@ namespace Tangy.Controllers
                         }
                     }
                     coupon.Picture = picture;
+                    _db.Coupons.Add(coupon);
+                    await _db.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+            return View(coupon);
+        }
+
+        // GET: Coupon/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+                return NotFound();
+
+            var coupon = await _db.Coupons.SingleOrDefaultAsync(m => m.ID == id);
+
+            if (coupon == null)
+                return NotFound();
+
+            return View(coupon);
+        }
+
+        // POST: Coupon/Edit/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, Coupon coupon)
+        {
+            if (id != coupon.ID)
+                return NotFound();
+
+            var couponFromDB = await _db.Coupons.Where(c => c.ID == id).FirstOrDefaultAsync();
+
+            if (ModelState.IsValid)
+            {
+                var files = HttpContext.Request.Form.Files;
+                if (files.Count > 0)
+                {
+                    if (files[0] != null && files[0].Length > 0)
+                    {
+                        byte[] picture = null;
+                        using (var fileStream = files[0].OpenReadStream())
+                        {
+                            using (var memoryStream = new MemoryStream())
+                            {
+                                fileStream.CopyTo(memoryStream);
+                                picture = memoryStream.ToArray();
+                            }
+                        }
+                        couponFromDB.Picture = picture;
+                    }
                 }
 
-                _db.Coupons.Add(coupon);
+                couponFromDB.Name = coupon.Name;
+                couponFromDB.Discount = coupon.Discount;
+                couponFromDB.MinimumAmount = coupon.MinimumAmount;
+                couponFromDB.CouponType = coupon.CouponType;
+                couponFromDB.IsActive = coupon.IsActive;
+
                 await _db.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
