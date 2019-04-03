@@ -18,7 +18,7 @@ namespace Tangy.Data.Migrations
                     CouponType = table.Column<string>(nullable: false),
                     Discount = table.Column<double>(nullable: false),
                     MinimumAmount = table.Column<double>(nullable: false),
-                    Picture = table.Column<byte[]>(nullable: false),
+                    Picture = table.Column<byte[]>(nullable: true),
                     IsActive = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>

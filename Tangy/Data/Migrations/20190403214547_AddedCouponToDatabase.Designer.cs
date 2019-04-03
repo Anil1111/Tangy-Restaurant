@@ -220,8 +220,7 @@ namespace Tangy.Data.Migrations
                     b.Property<string>("Name")
                         .IsRequired();
 
-                    b.Property<byte[]>("Picture")
-                        .IsRequired();
+                    b.Property<byte[]>("Picture");
 
                     b.HasKey("ID");
 
