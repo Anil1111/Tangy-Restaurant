@@ -66,7 +66,7 @@ namespace Tangy.Controllers
 
             var menuItemFromDb = _db.MenuItems.Find(MenuItemVM.MenuItem.ID);
 
-            if (files[0] != null && files[0].Length > 0)
+            if (files.Count > 0)
             {
                 //when user uploads an image
                 var uploads = Path.Combine(webRootPath, "images");
@@ -185,6 +185,45 @@ namespace Tangy.Controllers
                 return NotFound();
 
             return View(MenuItemVM);
+        }
+
+        // GET: MenuItem/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+                return NotFound();
+
+            MenuItemVM.MenuItem = await _db.MenuItems.Include(m => m.Category).Include(m => m.SubCategory).SingleOrDefaultAsync(m => m.ID == id);
+
+            if (MenuItemVM.MenuItem == null)
+                return NotFound();
+
+            return View(MenuItemVM);
+        }
+
+        // POST: MenuItem/Delete/5
+        [HttpPost]
+        [ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeletePost(int id)
+        {
+            string webRootPath = _hostingEnvironment.WebRootPath;
+            MenuItem menuItem = await _db.MenuItems.FindAsync(id);
+
+            if (menuItem != null)
+            {
+                var uploads = Path.Combine(webRootPath, "images");
+                var extension = menuItem.Image.Substring(menuItem.Image.LastIndexOf('.'), menuItem.Image.Length - menuItem.Image.LastIndexOf('.'));
+
+                var imagePath = Path.Combine(uploads, menuItem.ID + extension);
+
+                if (System.IO.File.Exists(imagePath))
+                    System.IO.File.Delete(imagePath);
+
+                _db.MenuItems.Remove(menuItem);
+                await _db.SaveChangesAsync();
+            }
+            return RedirectToAction(nameof(Index));
         }
     }
 }
