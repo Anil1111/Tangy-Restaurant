@@ -114,5 +114,36 @@ namespace Tangy.Controllers
             }
             return View(coupon);
         }
+
+        // GET: Coupon/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+                return NotFound();
+
+            var coupon = await _db.Coupons.SingleOrDefaultAsync(m => m.ID == id);
+
+            if (coupon == null)
+                return NotFound();
+
+            return View(coupon);
+        }
+
+        // POST: Coupon/Delete/5
+        [HttpPost]
+        [ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var coupon = await _db.Coupons.SingleOrDefaultAsync(m => m.ID == id);
+
+            if (coupon != null)
+            {
+                _db.Coupons.Remove(coupon);
+                await _db.SaveChangesAsync();
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
     }
 }
