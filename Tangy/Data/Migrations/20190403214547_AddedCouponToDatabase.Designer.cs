@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Tangy.Data;
 
 namespace Tangy.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20190403214547_AddedCouponToDatabase")]
+    partial class AddedCouponToDatabase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -198,6 +200,32 @@ namespace Tangy.Data.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("Categories");
+                });
+
+            modelBuilder.Entity("Tangy.Models.Coupon", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("CouponType")
+                        .IsRequired();
+
+                    b.Property<double>("Discount");
+
+                    b.Property<bool>("IsActive");
+
+                    b.Property<double>("MinimumAmount");
+
+                    b.Property<string>("Name")
+                        .IsRequired();
+
+                    b.Property<byte[]>("Picture")
+                        .IsRequired();
+
+                    b.HasKey("ID");
+
+                    b.ToTable("Coupons");
                 });
 
             modelBuilder.Entity("Tangy.Models.MenuItem", b =>
