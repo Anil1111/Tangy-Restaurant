@@ -134,21 +134,25 @@ namespace Tangy.Controllers
                     var files = HttpContext.Request.Form.Files;
                     var menuItemFromDb = _db.MenuItems.Where(m => m.ID == MenuItemVM.MenuItem.ID).FirstOrDefault();
 
-                    if (files[0].Length > 0 && files[0] != null)
+                    if (files.Count > 0)
                     {
-                        //if user uploads a new image
-                        var uploads = Path.Combine(webRootPath, "images");
 
-                        var newExtension = files[0].FileName.Substring(files[0].FileName.LastIndexOf('.'), files[0].FileName.Length - files[0].FileName.LastIndexOf('.'));
-                        var oldExtension = menuItemFromDb.Image.Substring(menuItemFromDb.Image.LastIndexOf('.'), menuItemFromDb.Image.Length - menuItemFromDb.Image.LastIndexOf('.'));
+                        if (files[0].Length > 0 && files[0] != null)
+                        {
+                            //if user uploads a new image
+                            var uploads = Path.Combine(webRootPath, "images");
 
-                        if (System.IO.File.Exists(Path.Combine(uploads, MenuItemVM.MenuItem.ID + oldExtension)))
-                            System.IO.File.Delete(Path.Combine(uploads, MenuItemVM.MenuItem.ID + oldExtension));
+                            var newExtension = files[0].FileName.Substring(files[0].FileName.LastIndexOf('.'), files[0].FileName.Length - files[0].FileName.LastIndexOf('.'));
+                            var oldExtension = menuItemFromDb.Image.Substring(menuItemFromDb.Image.LastIndexOf('.'), menuItemFromDb.Image.Length - menuItemFromDb.Image.LastIndexOf('.'));
 
-                        using (var filestream = new FileStream(Path.Combine(uploads, MenuItemVM.MenuItem.ID + newExtension), FileMode.Create))
-                            files[0].CopyTo(filestream);
+                            if (System.IO.File.Exists(Path.Combine(uploads, MenuItemVM.MenuItem.ID + oldExtension)))
+                                System.IO.File.Delete(Path.Combine(uploads, MenuItemVM.MenuItem.ID + oldExtension));
 
-                        MenuItemVM.MenuItem.Image = @"\images\" + MenuItemVM.MenuItem.ID + newExtension;
+                            using (var filestream = new FileStream(Path.Combine(uploads, MenuItemVM.MenuItem.ID + newExtension), FileMode.Create))
+                                files[0].CopyTo(filestream);
+
+                            MenuItemVM.MenuItem.Image = @"\images\" + MenuItemVM.MenuItem.ID + newExtension;
+                        }
                     }
 
                     if (MenuItemVM.MenuItem.Image != null)

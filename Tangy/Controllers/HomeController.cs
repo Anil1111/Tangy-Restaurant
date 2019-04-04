@@ -4,34 +4,32 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Tangy.Data;
 using Tangy.Models;
+using Tangy.Models.HomeViewModel;
 
 namespace Tangy.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly ApplicationDbContext _db;
+
+        public HomeController(ApplicationDbContext db)
         {
-            return View();
+            _db = db;
         }
 
-        public IActionResult About()
+        public async Task<IActionResult> Index()
         {
-            ViewData["Message"] = "Your application description page.";
+            var indexViewModel = new IndexViewModel()
+            {
+                MenuItems = await _db.MenuItems.Include(c => c.Category).Include(s => s.SubCategory).ToListAsync(),
+                Categories = _db.Categories.OrderBy(c => c.DisplayOrder).ToList(),
+                Coupons = _db.Coupons.Where(c => c.IsActive == true).ToList()
+            };
 
-            return View();
-        }
-
-        public IActionResult Contact()
-        {
-            ViewData["Message"] = "Your contact page.";
-
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
+            return View(indexViewModel);
         }
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
