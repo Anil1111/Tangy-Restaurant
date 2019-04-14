@@ -9,7 +9,9 @@ using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Tangy.Data;
 using Tangy.Models.AccountModels;
+using Tangy.Utility;
 
 namespace Tangy.Areas.Identity.Pages.Account
 {
@@ -20,17 +22,23 @@ namespace Tangy.Areas.Identity.Pages.Account
         private readonly UserManager<AppUser> _userManager;
         private readonly ILogger<RegisterModel> _logger;
         private readonly IEmailSender _emailSender;
+        private readonly ApplicationDbContext _db;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
         public RegisterModel(
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
             ILogger<RegisterModel> logger,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            ApplicationDbContext db,
+            RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _logger = logger;
             _emailSender = emailSender;
+            _roleManager = roleManager;
+            _db = db;
         }
 
         [BindProperty]
@@ -90,6 +98,13 @@ namespace Tangy.Areas.Identity.Pages.Account
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
+                    if (!await _roleManager.RoleExistsAsync(SD.AdminEndUser))
+                        await _roleManager.CreateAsync(new IdentityRole(SD.AdminEndUser));
+                    if (!await _roleManager.RoleExistsAsync(SD.CustomerEndUser))
+                        await _roleManager.CreateAsync(new IdentityRole(SD.CustomerEndUser));
+
+                    await _userManager.AddToRoleAsync(user, SD.CustomerEndUser);
+
                     _logger.LogInformation("User created a new account with password.");
 
                     var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
