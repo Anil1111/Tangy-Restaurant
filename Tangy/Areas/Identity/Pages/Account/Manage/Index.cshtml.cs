@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Tangy.Data;
+using Tangy.Extensions;
 using Tangy.Models.AccountModels;
 
 namespace Tangy.Areas.Identity.Pages.Account.Manage
@@ -17,15 +19,18 @@ namespace Tangy.Areas.Identity.Pages.Account.Manage
         private readonly UserManager<AppUser> _userManager;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IEmailSender _emailSender;
+        private readonly ApplicationDbContext _db;
 
         public IndexModel(
             UserManager<AppUser> userManager,
             SignInManager<AppUser> signInManager,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            ApplicationDbContext db)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _emailSender = emailSender;
+            _db = db;
         }
 
         public string Username { get; set; }
@@ -117,6 +122,18 @@ namespace Tangy.Areas.Identity.Pages.Account.Manage
                     var userId = await _userManager.GetUserIdAsync(user);
                     throw new InvalidOperationException($"Unexpected error occurred setting phone number for user with ID '{userId}'.");
                 }
+            }
+
+            if (!_userManager.UpdateUserFirstName(Input.FirstName, _db, user.Id))
+            {
+                var userId = await _userManager.GetUserIdAsync(user);
+                throw new InvalidOperationException($"Unexpected error occurred setting first name for user with ID '{userId}'.");
+            }
+
+            if (!_userManager.UpdateUserLastName(Input.LastName, _db, user.Id))
+            {
+                var userId = await _userManager.GetUserIdAsync(user);
+                throw new InvalidOperationException($"Unexpected error occurred setting last name for user with ID '{userId}'.");
             }
 
             await _signInManager.RefreshSignInAsync(user);
