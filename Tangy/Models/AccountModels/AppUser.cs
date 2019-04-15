@@ -11,5 +11,7 @@ namespace Tangy.Models.AccountModels
         public string FirstName { get; set; }
 
         public string LastName { get; set; }
+
+        public string LockoutReason { get; set; }
     }
 }
