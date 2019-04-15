@@ -1,0 +1,128 @@
+﻿@model Tangy.Models.AccountModels.AppUser
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+<script>
+    var d = new Date();
+    var year = d.getFullYear();
+
+    $(function () {
+        $("#datepicker").datepicker({
+            yearRange: year + ":" + (year + 50),
+            changeMonth: true,
+            changeYear: true
+        });
+    });
+</script>
+
+<br />
+<h3>Edit User</h3>
+<br />
+
+<form asp-action="Edit">
+    <div class="form-border">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="Id" />
+        <fieldset>
+            <div class="form-group row">
+                <div class="col-md-2">
+                    <label asp-for="UserName" class="custom-label"></label>
+                </div>
+                <div class="col-md-4">
+                    <input asp-for="UserName" readonly class="form-control" />
+                </div>
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+            <div class="form-group row">
+                <div class="col-md-2">
+                    <label asp-for="Email" class="custom-label"></label>
+                </div>
+                <div class="col-md-4">
+                    <input asp-for="Email" readonly class="form-control" />
+                </div>
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+        </fieldset>
+        <div class="form-group row">
+            <div class="col-md-2">
+                <label asp-for="FirstName" class="custom-label"></label>
+            </div>
+            <div class="col-md-4">
+                <input asp-for="FirstName" class="form-control" />
+            </div>
+            <span asp-validation-for="FirstName" class="text-danger"></span>
+        </div>
+        <div class="form-group row">
+            <div class="col-md-2">
+                <label asp-for="LastName" class="custom-label"></label>
+            </div>
+            <div class="col-md-4">
+                <input asp-for="LastName" class="form-control" />
+            </div>
+            <span asp-validation-for="LastName" class="text-danger"></span>
+        </div>
+        <div class="form-group row">
+            <div class="col-md-2">
+                <label asp-for="PhoneNumber" class="custom-label"></label>
+            </div>
+            <div class="col-md-4">
+                <input asp-for="PhoneNumber" class="form-control" />
+            </div>
+            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+        </div>
+        <div class="form-group row">
+            <div class="col-md-2">
+                <label asp-for="AccessFailedCount" class="custom-label"></label>
+            </div>
+            <div class="col-md-4">
+                <input asp-for="AccessFailedCount" class="form-control" />
+            </div>
+            <span asp-validation-for="AccessFailedCount" class="text-danger"></span>
+        </div>
+        @if (Model.LockoutEnd != null)
+        {
+            <div class="border border-danger" style="border-radius: 5px; padding: 5px;">
+                <h5 class="text-danger" style="margin: .57em;">Locked Account</h5>
+                <div class="form-group row">
+                    <div class="col-md-2">
+                        <label asp-for="LockoutEnd" class="custom-label"></label>
+                    </div>
+                    <div class="col-md-4">
+                        <input asp-for="LockoutEnd" asp-format="{0:MM/dd/yyyy}" readonly id="datepicker" style="background-color: white;" class="form-control" />
+                    </div>
+                    <span asp-validation-for="LockoutEnd" class="text-danger"></span>
+                </div>
+                <div class="form-group row">
+                    <div class="col-md-2">
+                        <label asp-for="LockoutReason" class="custom-label"></label>
+                    </div>
+                    <div class="col-md-4">
+                        <input asp-for="LockoutReason" class="form-control" />
+                    </div>
+                    <span asp-validation-for="LockoutReason" class="text-danger"></span>
+                </div>
+                <div style="text-align:right;">
+
+                    <a class="btn btn-warning" href="@Url.Action("Unlock/" + Model.Id)">Unlock <i class="fas fa-unlock"></i></a>
+                </div>
+            </div>
+        }
+        <br />
+        <div class="form-group" style="margin-left: 8px; margin-right: 8px;">
+            <input type="submit" value="Update" class="btn btn-primary" /> &nbsp;
+            <a asp-action="Index" class="btn btn-success">Back to List</a> &nbsp;
+            @if (Model.LockoutEnd == null)
+            {
+                <a class="btn btn-danger" href="@Url.Action("Lock/" + Model.Id)">Lock  <i class="fas fa-lock"></i></a>
+            }
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
